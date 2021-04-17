@@ -17,9 +17,10 @@
 
 import os
 import xml.etree.ElementTree
+
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Set, Tuple
-
+from repology.parsers.cpe import cpe_parse
 from repology.logger import Logger
 from repology.package import PackageFlags
 from repology.packagemaker import NameType, PackageFactory, PackageMaker
@@ -180,8 +181,8 @@ class GentooGitParser(Parser):
                 pkg.add_maintainers(xml_metadata.maintainers)
 
                 if xml_metadata.cpe is not None:
-                    cpe = xml_metadata.cpe.split(':')
-                    pkg.add_cpe(cpe[2], cpe[3])
+                    cpe = cpe_parse(xml_metadata.cpe)
+                    pkg.add_cpe(cpe.part, cpe.vendor)
 
                 for ebuild in _iter_ebuilds(path, category, package):
                     subpkg = pkg.clone(append_ident='/' + ebuild)
